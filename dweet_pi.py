@@ -11,11 +11,14 @@ def getTemperatureSensorData():
 		[temperature_raw, humidity_raw] = grovepi.dht(temperature_sensor_port,0)
 		return temperature_raw
 	except IOError:
-		print "Error"
+		print "Error reading Temperature and Humidity sensor on port {}".format(temperature_sensor_port)
 
 # Returns formatted range sensor data
 def getUltrasonicRangerData():
-	return 1;
+	try:
+		return grovepi.ultrasonicRead(ultrasonic_ranger_port)
+	except IOError:
+		print "Error reading Ultrasonic Ranger on port {}".format(ultrasonic_ranger_port)
 
 # Returns formatted light sensor data
 def getLightSensorData():
@@ -40,6 +43,7 @@ def getUploadData():
 # 'Main' script execution begins here
 # ===================================
 temperature_sensor_port = 6
+ultrasonic_ranger_port = 8
 
 # Update loop
 try:
