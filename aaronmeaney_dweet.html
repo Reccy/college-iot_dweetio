@@ -13,9 +13,58 @@
       <div id="button_container" style="width: 800px; height: 400px; margin: 0 auto"></div>
       <div id="cpu_container" style="width: 800px; height: 400px; margin: 0 auto"></div>
       <script language="JavaScript">
+
+         // Function to write retrieved dweet data to the local storage
+         function store_retrieved_dweets(new_dweet) {
+            j_new_dweet = JSON.stringify(new_dweet);
+
+            // Ensure the dweet is not a duplicate
+            isDuplicate = false;
+            retrieved_dweets.forEach(function(dweet) {
+               j_dweet = JSON.stringify(dweet);
+
+               if (j_dweet === j_new_dweet) {
+                  console.log('Dweet ' + j_dweet + ' already exists in local storage: ' + j_new_dweet);
+                  isDuplicate = true;
+               }
+            });
+
+            // Don't add dweet if it's a duplicate
+            if (isDuplicate) {
+               return;
+            }
+
+            console.log("Adding new Dweet: " + j_new_dweet);
+
+            retrieved_dweets.push(new_dweet);
+
+            console.log("Length of retrieved dweets: " + retrieved_dweets.length);
+
+            // Trim to 100 length
+            if (retrieved_dweets.length > 100) {
+               console.log("Truncating dweets");
+               retrieved_dweets = retrieved_dweets.slice(retrieved_dweets.length - 100)
+            }
+
+            // Save to local storage
+            localStorage.setItem('retrieved_dweets', JSON.stringify(retrieved_dweets));
+         }
+
+         /*
+          * MAIN ENTRY POINT
+          */
+
          // What dweet service to listen for
          var dweet_id = 'aaron_meaney_test'
 
+         // List of retrieved dweets
+         var retrieved_dweets = []
+
+         // Retrieve the previous dweets from local storage if they exist
+         if (localStorage.retrieved_dweets !== undefined) {
+            retrieved_dweets = JSON.parse(localStorage.retrieved_dweets);
+         }
+         
          //Disable UTC
          Highcharts.setOptions({
              global: {
@@ -264,6 +313,8 @@
                light_chart.series[0].addPoint([dweet_datetime, dweet['content']['light']], true, light_chart.series[0].data.length > 20);
                button_chart.series[0].addPoint([dweet_datetime, +dweet['content']['button']], true, button_chart.series[0].data.length > 20);
                cpu_chart.series[0].addPoint([dweet_datetime, dweet['content']['cpu_usage']], true, cpu_chart.series[0].data.length > 20);
+
+               store_retrieved_dweets(dweet);
             });
          });
 
@@ -277,6 +328,8 @@
             light_chart.series[0].addPoint([dweet_datetime, dweet['content']['light']], true, light_chart.series[0].data.length > 20);
             button_chart.series[0].addPoint([dweet_datetime, +dweet['content']['button']], true, button_chart.series[0].data.length > 20);
             cpu_chart.series[0].addPoint([dweet_datetime, dweet['content']['cpu_usage']], true, cpu_chart.series[0].data.length > 20);
+
+            store_retrieved_dweets(dweet);
          });
       </script>
    </body>
