@@ -16,9 +16,6 @@
          // What dweet service to listen for
          var dweet_id = 'aaron_meaney_test'
 
-         // Array of all the received dweets
-         var received_dweets = []
-
          //Disable UTC
          Highcharts.setOptions({
              global: {
@@ -143,7 +140,7 @@
 
          var button_chart = Highcharts.chart('button_container', {
             chart : {
-               type: 'spline',
+               type: 'column',
                animation: Highcharts.svg, // don't animate in IE < IE 10.
                marginRight: 10,
             },
@@ -255,29 +252,31 @@
             }
          });
 
-         // Populate all of the charts with history
+         // Initial chart population
          dweetio.get_all_dweets_for(dweet_id, function(err, dweets){
             console.log(err)
             console.log(dweets)
 
             dweets.reverse().forEach(function(dweet) {
-               received_dweets.push(dweet)
+               dweet_datetime = Date.parse(dweet['created'])
 
-               distance_chart.series[0].addPoint(dweet['content']['distance'], true, distance_chart.series[0].length > 20);
-               light_chart.series[0].addPoint(dweet['content']['light'], true, light_chart.series[0].length > 20);
-               button_chart.series[0].addPoint(dweet['content']['button'], true, button_chart.series[0].length > 20);
-               cpu_chart.series[0].addPoint(dweet['content']['cpu_usage'], true, cpu_chart.series[0].length > 20);
+               distance_chart.series[0].addPoint([dweet_datetime, dweet['content']['distance']], true, distance_chart.series[0].data.length > 20);
+               light_chart.series[0].addPoint([dweet_datetime, dweet['content']['light']], true, light_chart.series[0].data.length > 20);
+               button_chart.series[0].addPoint([dweet_datetime, +dweet['content']['button']], true, button_chart.series[0].data.length > 20);
+               cpu_chart.series[0].addPoint([dweet_datetime, dweet['content']['cpu_usage']], true, cpu_chart.series[0].data.length > 20);
             });
          });
 
          // Live update all of the charts
          dweetio.listen_for(dweet_id, function(dweet){
             console.log('Dweet received: ' + dweet)
+            
+            dweet_datetime = Date.parse(dweet['created'])
 
-            distance_chart.series[0].addPoint(dweet['content']['distance'], true, distance_chart.series[0].length > 20);
-            light_chart.series[0].addPoint(dweet['content']['light'], true, light_chart.series[0].length > 20);
-            button_chart.series[0].addPoint(dweet['content']['button'], true, button_chart.series[0].length > 20);
-            cpu_chart.series[0].addPoint(dweet['content']['cpu_usage'], true, cpu_chart.series[0].length > 20);
+            distance_chart.series[0].addPoint([dweet_datetime, dweet['content']['distance']], true, distance_chart.series[0].data.length > 20);
+            light_chart.series[0].addPoint([dweet_datetime, dweet['content']['light']], true, light_chart.series[0].data.length > 20);
+            button_chart.series[0].addPoint([dweet_datetime, +dweet['content']['button']], true, button_chart.series[0].data.length > 20);
+            cpu_chart.series[0].addPoint([dweet_datetime, dweet['content']['cpu_usage']], true, cpu_chart.series[0].data.length > 20);
          });
       </script>
    </body>
