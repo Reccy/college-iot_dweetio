@@ -49,7 +49,7 @@ def getUploadData():
 def uploadToDweet(dict):
 	try:
 		print "   > dweet.io upload: {}".format(dweepy.dweet_for('aaron_meaney_test', dict))
-	except dweepy.api.DweepyError as e:
+	except Exception as e:
 		print "   > dweet.io upload exception: {}".format(e)
 
 # Writes a dictionary to the local database
